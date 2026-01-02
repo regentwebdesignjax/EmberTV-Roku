@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="RentalsScene" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/RentalsScene.brs" />
+ 
+  <children>
+    <Rectangle
+      id="bg"
+      width="1920"
+      height="1080"
+      color="#151515" />
+
+    <EmberTheme id="theme" />
+
+    <Poster 
+      id="headerLogo"
+      translation="[80, 30]"
+      width="520"
+      height="150"
+      loadDisplayMode="scaleToFit"
+      uri="pkg:/images/logo/logo_fhd.png" />
+
+    <Group translation="[960, 80]">
+      <Label
+        id="titleLabel"
+        text="My Rentals"
+        font="fontH1"
+        color="#FFFFFF"
+        horizAlign="center"
+        translation="[0,0]" />
+      
+      <Label
+        id="subtitleLabel"
+        text="Your active 24-hour rentals, ready to watch."
+        font="fontSmall"
+        color="#AAAAAA"
+        horizAlign="center"
+        translation="[0, 70]" />
+    </Group>
+
+    <Group translation="[1450, 80]">
+      <Group id="refreshBtn" focusable="true">
+         <Rectangle id="refreshBorder" width="180" height="60" color="#EF6418" />
+         <Rectangle id="refreshFill" width="176" height="56" translation="[2,2]" color="#151515" />
+         <Label 
+            id="refreshLabel"
+            text="Refresh" 
+            width="180" height="60" 
+            horizAlign="center" vertAlign="center" 
+            font="font:MediumBoldSystemFont" 
+            color="#FFFFFF" />
+      </Group>
+
+      <Group id="logoutBtn" translation="[220, 0]" focusable="true">
+         <Rectangle id="logoutBorder" width="180" height="60" color="#EF6418" />
+         <Rectangle id="logoutFill" width="176" height="56" translation="[2,2]" color="#151515" />
+         <Label 
+            id="logoutLabel"
+            text="Log Out" 
+            width="180" height="60" 
+            horizAlign="center" vertAlign="center" 
+            font="font:MediumBoldSystemFont" 
+            color="#FFFFFF" />
+      </Group>
+    </Group>
+
+    <MarkupGrid
+      id="grid"
+      translation="[80, 280]"
+      itemSize="[270, 480]"
+      itemSpacing="[40, 60]"
+      numColumns="6"
+      numRows="2"
+      vertFocusAnimationStyle="fixedFocusWrap"
+      drawFocusFeedback="false"
+      itemComponentName="RentalGridItem" />
+
+    <RentalsTask id="rentalsTask" />
+  </children>
+
+  <interface>
+    <field id="authToken" type="string" />
+    <field id="refreshNow" type="boolean" alwaysNotify="true" />
+    <field id="selectedRental" type="node" alwaysNotify="true" />
+    <field id="logoutRequested" type="boolean" alwaysNotify="true" />
+  </interface>
+</component>

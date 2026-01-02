@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="RentalsTask" extends="Task">
+  <script type="text/brightscript" uri="pkg:/source/utils.brs" />
+  
+  <script type="text/brightscript" uri="pkg:/source/apiClient.brs" />
+  <script type="text/brightscript" uri="pkg:/components/RentalsTask.brs" />
+
+  <interface>
+    <field id="authToken" type="string" value="" alwaysNotify="true" />
+    <field id="status" type="string" value="idle" alwaysNotify="true" />
+    <field id="error" type="string" value="" alwaysNotify="true" />
+    <field id="content" type="node" alwaysNotify="true" />
+  </interface>
+</component>

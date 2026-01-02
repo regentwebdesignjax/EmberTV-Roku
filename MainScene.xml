@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="MainScene" extends="Scene">
+  <script type="text/brightscript" uri="pkg:/components/MainScene.brs" />
+
+  <interface>
+    <function name="handleDeepLink" />
+  </interface>
+
+  <children>
+    <Rectangle id="bg" width="1920" height="1080" color="#000000" />
+    
+    <LoginScene   id="loginScene"   visible="false" />
+    <RentalsScene id="rentalsScene" visible="false" />
+    <PlayerScene  id="playerScene"  visible="false" />
+  </children>
+</component>

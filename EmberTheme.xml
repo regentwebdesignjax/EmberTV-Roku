@@ -1,0 +1,14 @@
+<component name="EmberTheme" extends="Group">
+  <children>
+    <!-- Fonts -->
+    <Font id="fontH1" uri="pkg:/fonts/AlbertSans-Bold.ttf" size="54" />
+    <Font id="fontH2" uri="pkg:/fonts/AlbertSans-SemiBold.ttf" size="40" />
+    <Font id="fontBody" uri="pkg:/fonts/AlbertSans-Regular.ttf" size="30" />
+    <Font id="fontSmall" uri="pkg:/fonts/AlbertSans-Regular.ttf" size="24" />
+    <Font id="fontButton" uri="pkg:/fonts/AlbertSans-SemiBold.ttf" size="32" />
+
+    <!-- Optional: for TextEditBox text -->
+    <Font id="fontInput" uri="pkg:/fonts/AlbertSans-Regular.ttf" size="32" />
+    <Font id="fontInputHint" uri="pkg:/fonts/AlbertSans-Regular.ttf" size="28" />
+  </children>
+</component>
