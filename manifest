@@ -1,0 +1,16 @@
+title=EmberTV
+major_version=1
+minor_version=4
+build_version=14
+ui_resolutions=HD,FHD
+supports_input_launch=1
+
+# --- CHANNEL ICONS ---
+mm_icon_focus_sd=pkg:/images/logo/logo_sd.png
+mm_icon_focus_hd=pkg:/images/logo/logo_hd.png
+mm_icon_focus_fhd=pkg:/images/logo/logo_fhd.png
+
+# --- SPLASH SCREENS ---
+splash_screen_sd=pkg:/images/splash/splash_sd.png
+splash_screen_hd=pkg:/images/splash/splash_hd.png
+splash_screen_fhd=pkg:/images/splash/splash_fhd.png
