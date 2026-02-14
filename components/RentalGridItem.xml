@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="RentalGridItem" extends="Group">
+  <script type="text/brightscript" uri="pkg:/components/RentalGridItem.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" onChange="onItemContentChanged" />
+    <field id="focusPercent" type="float" onChange="onFocusPercentChanged" />
+  </interface>
+
+  <children>
+    <EmberTheme id="theme" />
+
+    <Group id="focusGlow" visible="false">
+        <Rectangle 
+            width="286" 
+            height="416" 
+            translation="[-8, -8]" 
+            color="#EF6418" 
+            opacity="0.5" />
+            
+        <Rectangle 
+            width="278" 
+            height="408" 
+            translation="[-4, -4]" 
+            color="#EF6418" 
+            opacity="0.9" />
+    </Group>
+
+    <Poster
+      id="poster"
+      width="270"
+      height="400"
+      loadWidth="270"
+      loadHeight="400"
+      loadDisplayMode="scaleToFit" />
+
+    <Label
+      id="titleLabel"
+      translation="[0, 415]"
+      width="270"
+      height="28"
+      font="fontSmall"
+      color="#FFFFFF"
+      horizAlign="left"
+      ellipsizeOnBoundary="true" />
+
+    <Label
+      id="metaLabel"
+      translation="[0, 448]"
+      width="270"
+      height="20"
+      font="fontSmall"
+      color="#AAAAAA"
+      horizAlign="left" />
+  </children>
+</component>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component name="LoginTask" extends="Task">
+  <script type="text/brightscript" uri="pkg:/source/utils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/apiClient.brs" />
+  <script type="text/brightscript" uri="pkg:/components/LoginTask.brs" />
+
+  <interface>
+    <field id="email" type="string" />
+    <field id="password" type="string" />
+    <field id="status" type="string" value="idle" alwaysNotify="true" />
+    <field id="error" type="string" value="" alwaysNotify="true" />
+    <field id="token" type="string" value="" alwaysNotify="true" />
+  </interface>
+</component>

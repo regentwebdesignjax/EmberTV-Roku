@@ -1,7 +1,7 @@
 title=EmberTV
 major_version=1
-minor_version=4
-build_version=14
+minor_version=7
+build_version=0
 ui_resolutions=HD,FHD
 supports_input_launch=1
 
