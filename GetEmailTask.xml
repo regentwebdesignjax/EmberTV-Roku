@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<component name="GetEmailTask" extends="Task">
-  <interface>
-    <field id="email" type="string" />
-  </interface>
-  <script type="text/brightscript" uri="pkg:/components/GetEmailTask.brs" />
-</component>
