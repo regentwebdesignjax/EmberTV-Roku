@@ -3,69 +3,74 @@
   <script type="text/brightscript" uri="pkg:/components/RentalsScene.brs" />
  
   <children>
-    <Rectangle
-      id="bg"
-      width="1920"
-      height="1080"
-      color="#151515" />
+    <Rectangle id="bg" width="1920" height="1080" color="0x121212FF" />
 
     <EmberTheme id="theme" />
 
     <Poster 
       id="headerLogo"
-      translation="[80, 30]"
-      width="520"
-      height="150"
+      translation="[30, 10]"
+      width="650"
+      height="180"
       loadDisplayMode="scaleToFit"
       uri="pkg:/images/logo/logo_header.png" />
 
-    <Group translation="[960, 80]">
+    <Group translation="[960, 60]">
       <Label
         id="titleLabel"
         text="My Rentals"
         font="fontH1"
-        color="#FFFFFF"
+        color="0xFFFFFFFF"
         horizAlign="center"
         translation="[0,0]" />
       
       <Label
         id="subtitleLabel"
-        text="Your active 24-hour rentals, ready to watch."
+        text="Your active 48-hour rentals, ready to watch."
         font="fontSmall"
-        color="#AAAAAA"
+        color="0xAAAAAAFF"
         horizAlign="center"
         translation="[0, 70]" />
     </Group>
 
-    <Group translation="[1450, 80]">
+    <Group translation="[1450, 60]">
       <Group id="refreshBtn" focusable="true">
-         <Rectangle id="refreshBorder" width="180" height="60" color="#EF6418" />
-         <Rectangle id="refreshFill" width="176" height="56" translation="[2,2]" color="#151515" />
+         <Rectangle id="refreshFill" width="180" height="60" color="0x2A2A2AFF" />
          <Label 
             id="refreshLabel"
             text="Refresh" 
             width="180" height="60" 
             horizAlign="center" vertAlign="center" 
             font="font:MediumBoldSystemFont" 
-            color="#FFFFFF" />
+            color="0xFFFFFFFF" />
       </Group>
 
       <Group id="logoutBtn" translation="[220, 0]" focusable="true">
-         <Rectangle id="logoutBorder" width="180" height="60" color="#EF6418" />
-         <Rectangle id="logoutFill" width="176" height="56" translation="[2,2]" color="#151515" />
+         <Rectangle id="logoutFill" width="180" height="60" color="0x2A2A2AFF" />
          <Label 
             id="logoutLabel"
-            text="Log Out" 
+            text="Sign Out" 
             width="180" height="60" 
             horizAlign="center" vertAlign="center" 
             font="font:MediumBoldSystemFont" 
-            color="#FFFFFF" />
+            color="0xFFFFFFFF" />
       </Group>
+    </Group>
+
+    <Group id="focusedMetadata" translation="[80, 190]">
+        <Label
+            id="focusedTitle"
+            text=""
+            font="font:LargeBoldSystemFont"
+            color="0xFFFFFFFF"
+            width="1000"
+            height="50"
+            wrap="false" />
     </Group>
 
     <MarkupGrid
       id="grid"
-      translation="[80, 280]"
+      translation="[80, 260]"
       itemSize="[270, 480]"
       itemSpacing="[40, 60]"
       numColumns="6"

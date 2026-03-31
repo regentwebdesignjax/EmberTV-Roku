@@ -1,12 +1,11 @@
 ' components/RentalGridItem.brs
 
 sub init()
-    m.poster = m.top.findNode("poster")
-    m.title  = m.top.findNode("titleLabel")
-    m.meta   = m.top.findNode("metaLabel")
-    
-    ' The new Glow Group
-    m.glow   = m.top.findNode("focusGlow")
+    m.poster          = m.top.findNode("poster")
+    m.expirationLabel = m.top.findNode("expirationLabel")
+    m.focusRing       = m.top.findNode("focusRing")
+    m.focusAnim       = m.top.findNode("focusAnim")
+    m.scaleInterp     = m.top.findNode("scaleInterp")
 end sub
 
 sub onItemContentChanged()
@@ -24,29 +23,28 @@ sub onItemContentChanged()
         end if
     end if
 
-    ' 2. Text Labels
-    if m.title <> invalid then
-        if c.Title <> invalid then m.title.text = c.Title else m.title.text = ""
-    end if
-
-    if m.meta <> invalid then
-        txt = ""
-        if c.year <> invalid then txt = c.year.ToStr()
-        if c.genre <> invalid then
-            if txt <> "" then txt = txt + " • "
-            txt = txt + c.genre
+    ' 2. Expiration Label
+    if m.expirationLabel <> invalid then
+        if c.description <> invalid and c.description <> "" then 
+            m.expirationLabel.text = c.description 
+        else 
+            m.expirationLabel.text = "Available to watch"
         end if
-        m.meta.text = txt
     end if
 end sub
 
 sub onFocusPercentChanged()
-    if m.glow = invalid then return
+    if m.focusRing = invalid then return
     
-    ' Show glow when item is focused
+    ' Drive the animation frame based on the focus percent
+    m.scaleInterp.fraction = m.top.focusPercent
+
+    ' Show crisp border and turn text orange when item is focused
     if m.top.focusPercent > 0.5 then
-        m.glow.visible = true
+        m.focusRing.visible = true
+        m.expirationLabel.color = "0xEF6418FF" ' EmberTV Orange
     else
-        m.glow.visible = false
+        m.focusRing.visible = false
+        m.expirationLabel.color = "0xAAAAAAFF" ' Dimmed Grey
     end if
 end sub

@@ -1,20 +1,19 @@
+' components/LoginScene.brs
+
 sub init()
     m.focusTimer = m.top.findNode("focusTimer")
-    m.emailValue = m.top.findNode("emailValue")
-    m.passValue  = m.top.findNode("passValue")
-    m.btnBg      = m.top.findNode("btnBg")
-    m.btnText    = m.top.findNode("btnText")
+    
+    m.emailValue   = m.top.findNode("emailValue")
+    m.emailFocusBg = m.top.findNode("emailFocusBg")
+    
+    m.passValue   = m.top.findNode("passValue")
+    m.passFocusBg = m.top.findNode("passFocusBg")
+    
+    m.btnBg        = m.top.findNode("btnBg")
+    m.btnFocusBg   = m.top.findNode("btnFocusBg")
+    m.btnText      = m.top.findNode("btnText")
+    
     m.errorLabel = m.top.findNode("errorLabel")
-
-    ' Ring references
-    m.emailTop    = m.top.findNode("emailRingTop")
-    m.emailBottom = m.top.findNode("emailRingBottom")
-    m.emailLeft   = m.top.findNode("emailRingLeft")
-    m.emailRight  = m.top.findNode("emailRingRight")
-    m.passTop    = m.top.findNode("passRingTop")
-    m.passBottom = m.top.findNode("passRingBottom")
-    m.passLeft   = m.top.findNode("passRingLeft")
-    m.passRight  = m.top.findNode("passRingRight")
 
     m.loginTask = m.top.findNode("loginTask")
     if m.loginTask <> invalid then
@@ -27,7 +26,7 @@ sub init()
     m._editing = ""
     m.selectedIndex = 0
     m.isLoading = false
-    m.emailChecked = false ' Keeps track if we already asked Roku for email
+    m.emailChecked = false
 
     hideError()
     renderFields()
@@ -77,7 +76,6 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
 
     if key = "OK" then
         if m.selectedIndex = 0 then
-            ' ✅ NEW LOGIC: Ask Roku for email first!
             if m.emailChecked = false
                 triggerRokuEmailCheck()
             else
@@ -96,9 +94,8 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
     return false
 end function
 
-' ✅ NEW: Runs when user clicks Email field
 sub triggerRokuEmailCheck()
-    m.emailChecked = true ' Mark done so we don't ask twice
+    m.emailChecked = true 
     m.emailTask = CreateObject("roSGNode", "GetEmailTask")
     if m.emailTask <> invalid
         m.emailTask.observeField("email", "onEmailLoaded")
@@ -109,9 +106,7 @@ sub triggerRokuEmailCheck()
 end sub
 
 sub onEmailLoaded()
-    ' If Roku gave us an email, fill it. If not, open keyboard.
     if m.emailTask.email <> invalid and m.emailTask.email <> "" then
-        print "Found Roku Email: "; m.emailTask.email
         m._email = m.emailTask.email
         renderFields() 
     else
@@ -120,29 +115,42 @@ sub onEmailLoaded()
 end sub
 
 sub renderSelection()
-    setEmailOutline(m.selectedIndex = 0)
-    setPassOutline(m.selectedIndex = 1)
-    if m.btnBg <> invalid then
-        if m.selectedIndex = 2 then
-            m.btnBg.opacity = 1.0
-        else
-            m.btnBg.opacity = 0.92
+    ' 0: Email Focus
+    if m.selectedIndex = 0 then
+        m.emailFocusBg.visible = true
+        m.emailValue.color = "0x121212FF" ' Dark text on light grey
+    else
+        m.emailFocusBg.visible = false
+        if m._email <> "" then 
+            m.emailValue.color = "0xFFFFFFFF" 
+        else 
+            m.emailValue.color = "0x888888FF" 
         end if
     end if
-end sub
-
-sub setEmailOutline(v as Boolean)
-    if m.emailTop <> invalid then m.emailTop.visible = v
-    if m.emailBottom <> invalid then m.emailBottom.visible = v
-    if m.emailLeft <> invalid then m.emailLeft.visible = v
-    if m.emailRight <> invalid then m.emailRight.visible = v
-end sub
-
-sub setPassOutline(v as Boolean)
-    if m.passTop <> invalid then m.passTop.visible = v
-    if m.passBottom <> invalid then m.passBottom.visible = v
-    if m.passLeft <> invalid then m.passLeft.visible = v
-    if m.passRight <> invalid then m.passRight.visible = v
+    
+    ' 1: Password Focus
+    if m.selectedIndex = 1 then
+        m.passFocusBg.visible = true
+        m.passValue.color = "0x121212FF" ' Dark text on light grey
+    else
+        m.passFocusBg.visible = false
+        if m._pass <> "" then 
+            m.passValue.color = "0xFFFFFFFF" 
+        else 
+            m.passValue.color = "0x888888FF"
+        end if
+    end if
+    
+    ' 2: Button Focus
+    if m.selectedIndex = 2 then
+        m.btnFocusBg.visible = true    ' Show outer orange ring
+        m.btnBg.color = "0xEF6418FF"   ' Make inner box orange
+        m.btnText.color = "0xFFFFFFFF" ' Bright White Text
+    else
+        m.btnFocusBg.visible = false
+        m.btnBg.color = "0x2A2A2AFF"   ' Unfocused Dark Grey
+        m.btnText.color = "0xAAAAAAFF" ' Unfocused Dim Text
+    end if
 end sub
 
 sub openKeyboard(which as String)
@@ -151,7 +159,7 @@ sub openKeyboard(which as String)
     if kbd = invalid then return
 
     if which = "email" then
-        kbd.title = "Email"
+        kbd.title = "Email Address"
         kbd.text = m._email
     else
         kbd.title = "Password"
@@ -208,11 +216,22 @@ end sub
 
 sub renderFields()
     if m.emailValue <> invalid then
-        if m._email <> "" then m.emailValue.text = m._email else m.emailValue.text = "you@example.com"
+        if m._email <> "" then 
+            m.emailValue.text = m._email 
+        else 
+            m.emailValue.text = "Email Address"
+        end if
     end if
+    
     if m.passValue <> invalid then
-        if m._pass <> "" then m.passValue.text = "••••••••" else m.passValue.text = "••••••••"
+        if m._pass <> "" then 
+            m.passValue.text = "••••••••" 
+        else 
+            m.passValue.text = "Password"
+        end if
     end if
+    
+    renderSelection()
 end sub
 
 sub attemptLogin()
@@ -231,8 +250,8 @@ sub attemptLogin()
     end if
 
     m.isLoading = true
-    if m.btnText <> invalid then m.btnText.text = "Signing in…"
-    if m.btnBg <> invalid then m.btnBg.opacity = 0.5
+    if m.btnText <> invalid then m.btnText.text = "Logging In…"
+    if m.btnFocusBg <> invalid then m.btnFocusBg.opacity = 0.5
 
     if m.loginTask <> invalid then
         m.loginTask.email = m._email
@@ -267,8 +286,8 @@ end sub
 
 sub resetLoading()
     m.isLoading = false
-    if m.btnText <> invalid then m.btnText.text = "Sign In"
-    if m.btnBg <> invalid then m.btnBg.opacity = 0.92
+    if m.btnText <> invalid then m.btnText.text = "Log In"
+    if m.btnFocusBg <> invalid then m.btnFocusBg.opacity = 1.0
 end sub
 
 sub showError(msg as String)

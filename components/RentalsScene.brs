@@ -1,8 +1,6 @@
 ' components/RentalsScene.brs
 
 sub init()
-    print "RentalsScene.init()"
-
     m.titleLabel = m.top.findNode("titleLabel")
     m.grid = m.top.findNode("grid")
     m.task = m.top.findNode("rentalsTask")
@@ -14,36 +12,31 @@ sub init()
     m.logoutFill   = m.top.findNode("logoutFill")
     m.refreshLabel = m.top.findNode("refreshLabel")
     m.logoutLabel  = m.top.findNode("logoutLabel")
-
-    if m.task = invalid then print "RentalsScene: rentalsTask node NOT found"
+    
+    m.focusedTitle = m.top.findNode("focusedTitle")
 
     if m.grid <> invalid then
         m.grid.observeField("itemSelected", "onGridItemSelected")
+        m.grid.observeField("itemFocused", "onGridItemFocused")
     end if
 
     m.top.observeField("authToken", "onAuthTokenChanged")
     m.top.observeField("refreshNow", "onRefreshNowChanged")
-    
-    ' FIX: Observe visibility to restore focus automatically
     m.top.observeField("visible", "onVisibleChanged")
 
     m._lastToken = ""
     m._focusState = "grid"
     
-    ' Initial visuals
     updateFocusVisuals()
 end sub
 
-' FIX: Ensure proper element gets focus when screen appears
 sub onVisibleChanged()
     if m.top.visible = true then
-        ' Restore focus to the last known state (defaulting to grid)
         if m._focusState = "refresh" then
             if m.refreshBtn <> invalid then m.refreshBtn.setFocus(true)
         else if m._focusState = "logout" then
             if m.logoutBtn <> invalid then m.logoutBtn.setFocus(true)
         else
-            ' Default to Grid
             if m.grid <> invalid then m.grid.setFocus(true)
         end if
         updateFocusVisuals()
@@ -53,7 +46,6 @@ end sub
 sub onAuthTokenChanged()
     token = m.top.authToken
     if token = invalid then token = ""
-    
     if token = "" then return
     if token = m._lastToken then return
     m._lastToken = token
@@ -77,7 +69,6 @@ sub loadRentals()
 end sub
 
 sub onTaskStatusChanged()
-    ' optional
 end sub
 
 sub onTaskContentChanged()
@@ -88,7 +79,6 @@ sub onTaskContentChanged()
     if m.grid <> invalid then
         m.grid.content = c
         m.grid.jumpToItem = 0
-        ' Only set focus if we are currently visible and in grid mode
         if m.top.visible = true and m._focusState = "grid" then 
             m.grid.setFocus(true)
         end if
@@ -105,32 +95,44 @@ sub onGridItemSelected()
     item = c.getChild(idx)
     if item = invalid then return
 
-    ' Force change
     m.top.selectedRental = invalid
     m.top.selectedRental = item
+end sub
+
+sub onGridItemFocused()
+    if m.grid = invalid or m.focusedTitle = invalid then return
+    
+    idx = m.grid.itemFocused
+    c = m.grid.content
+    
+    if c <> invalid and idx >= 0 and idx < c.getChildCount() then
+        item = c.getChild(idx)
+        if item <> invalid and item.Title <> invalid then
+            ' Display the title of the highlighted item dynamically
+            m.focusedTitle.text = item.Title
+        end if
+    end if
 end sub
 
 ' ---- FOCUS HANDLING ----
 
 sub updateFocusVisuals()
-    c_orange = "#EF6418"
-    c_dark   = "#151515"
-    c_white  = "#FFFFFF"
-    c_black  = "#000000"
+    c_unfocused_bg   = "0x2A2A2AFF" ' Dark Grey
+    c_unfocused_text = "0xAAAAAAFF" ' Dim White
+    c_focused_bg     = "0xEBEBEBFF" ' Light Grey Highlight
+    c_focused_text   = "0x121212FF" ' Dark Text
 
-    ' Default: Dark bg, White text
-    if m.refreshFill <> invalid then m.refreshFill.color = c_dark
-    if m.refreshLabel <> invalid then m.refreshLabel.color = c_white
-    if m.logoutFill <> invalid then m.logoutFill.color = c_dark
-    if m.logoutLabel <> invalid then m.logoutLabel.color = c_white
+    if m.refreshFill <> invalid then m.refreshFill.color = c_unfocused_bg
+    if m.refreshLabel <> invalid then m.refreshLabel.color = c_unfocused_text
+    if m.logoutFill <> invalid then m.logoutFill.color = c_unfocused_bg
+    if m.logoutLabel <> invalid then m.logoutLabel.color = c_unfocused_text
 
-    ' Highlight selected
     if m._focusState = "refresh" then
-        if m.refreshFill <> invalid then m.refreshFill.color = c_orange
-        if m.refreshLabel <> invalid then m.refreshLabel.color = c_black
+        if m.refreshFill <> invalid then m.refreshFill.color = c_focused_bg
+        if m.refreshLabel <> invalid then m.refreshLabel.color = c_focused_text
     else if m._focusState = "logout" then
-        if m.logoutFill <> invalid then m.logoutFill.color = c_orange
-        if m.logoutLabel <> invalid then m.logoutLabel.color = c_black
+        if m.logoutFill <> invalid then m.logoutFill.color = c_focused_bg
+        if m.logoutLabel <> invalid then m.logoutLabel.color = c_focused_text
     end if
 end sub
 
@@ -138,22 +140,19 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
     if press = false then return false
 
     if m._focusState = "grid" then
-        ' Safety: If we think we are in grid mode, but grid lacks focus, force it.
         if m.grid <> invalid and not m.grid.hasFocus() then
             m.grid.setFocus(true)
         end if
 
         if key = "up" then
-            ' Move to Refresh button
             currIdx = m.grid.itemFocused
-            if currIdx < 6 then ' Only from top row
+            if currIdx < 6 then ' Top row (6 columns)
                 m._focusState = "refresh"
                 if m.refreshBtn <> invalid then m.refreshBtn.setFocus(true) 
                 updateFocusVisuals()
                 return true
             end if
         end if
-        ' Allow Grid to handle everything else (Left/Right/Down)
         return false
 
     else if m._focusState = "refresh" then

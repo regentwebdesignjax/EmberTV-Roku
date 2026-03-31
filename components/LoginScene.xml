@@ -8,51 +8,61 @@
   </interface>
 
   <children>
-    <EmberTheme id="theme" />
     <LoginTask id="loginTask" />
 
-    <Rectangle id="bg" width="1920" height="1080" color="#0B0B0F" />
-    
+    <Rectangle id="bg" width="1920" height="1080" color="0x000000FF" />
+
     <Timer id="focusTimer" duration="0.10" repeat="false" />
 
-    <Group id="card" translation="[540,170]">
-      <Rectangle id="cardBg" width="840" height="740" color="#141420" />
-      <Rectangle id="cardStroke" width="840" height="740" color="#2A2A3A" />
-
-      <Poster id="logo" translation="[110, 40]" width="620" height="150"
-              loadDisplayMode="scaleToFit" 
+    <Group id="leftContent" translation="[130, 300]">
+      
+      <Poster id="logo" translation="[0, -40]" width="800" height="250" 
+              loadDisplayMode="scaleToFit"
               uri="pkg:/images/logo/logo_header.png" />
 
-      <Label id="title" translation="[80,190]" width="680" height="70" text="Sign in" />
-      <Label id="subtitle" translation="[80,255]" width="680" height="70"
-             text="Log into your EmberTV account." wrap="true" numLines="2" />
+      <Label id="title" translation="[0, 180]" width="920" height="80" 
+             text="The way family movie nights should be." 
+             color="0xFFFFFFFF" wrap="false" numLines="1"
+             font="font:LargeBoldSystemFont" />
+             
+      <Label id="subtitle" translation="[0, 280]" width="850" height="100"
+             text="Rent movies on the EmberTV web app and watch them instantly right here on your Roku." 
+             color="0xAAAAAAFF" wrap="true" numLines="2"
+             font="font:MediumSystemFont" />
+    </Group>
 
-      <Label id="emailLabel" translation="[80,320]" width="680" height="34" text="Email" />
-      <Group id="emailField" translation="[80,360]">
-        <Rectangle id="emailBg" width="680" height="72" color="#1B1B2A" />
-        <Rectangle id="emailRingTop"    translation="[-4,-4]" width="688" height="4" color="#EF6418" visible="false" />
-        <Rectangle id="emailRingBottom" translation="[-4,72]" width="688" height="4" color="#EF6418" visible="false" />
-        <Rectangle id="emailRingLeft"   translation="[-4,-4]" width="4"   height="80" color="#EF6418" visible="false" />
-        <Rectangle id="emailRingRight"  translation="[680,-4]" width="4"  height="80" color="#EF6418" visible="false" />
-        <Label id="emailValue" translation="[16,16]" width="648" height="40" text="you@example.com" />
+    <Group id="form" translation="[1100, 300]">
+      
+      <Label id="formTitle" translation="[0, 0]" width="680" height="80" 
+             text="Sign In" color="0xFFFFFFFF" font="font:LargeBoldSystemFont" />
+
+      <Group id="emailField" translation="[0, 120]">
+        <Rectangle id="emailBg" width="640" height="80" color="0x1A1A1AFF" />
+        <Rectangle id="emailFocusBg" width="656" height="96" translation="[-8,-8]" color="0xEBEBEBFF" visible="true" />
+        
+        <Label id="emailValue" translation="[30, 20]" width="580" height="40" 
+               text="Email Address" color="0x121212FF" font="font:MediumSystemFont" vertAlign="center" />
       </Group>
 
-      <Label id="passLabel" translation="[80,455]" width="680" height="34" text="Password" />
-      <Group id="passField" translation="[80,495]">
-        <Rectangle id="passBg" width="680" height="72" color="#1B1B2A" />
-        <Rectangle id="passRingTop"    translation="[-4,-4]" width="688" height="4" color="#EF6418" visible="false" />
-        <Rectangle id="passRingBottom" translation="[-4,72]" width="688" height="4" color="#EF6418" visible="false" />
-        <Rectangle id="passRingLeft"   translation="[-4,-4]" width="4"   height="80" color="#EF6418" visible="false" />
-        <Rectangle id="passRingRight"  translation="[680,-4]" width="4"  height="80" color="#EF6418" visible="false" />
-        <Label id="passValue" translation="[16,16]" width="648" height="40" text="••••••••" />
+      <Group id="passField" translation="[0, 240]">
+        <Rectangle id="passBg" width="640" height="80" color="0x1A1A1AFF" />
+        <Rectangle id="passFocusBg" width="656" height="96" translation="[-8,-8]" color="0xEBEBEBFF" visible="false" />
+        
+        <Label id="passValue" translation="[30, 20]" width="580" height="40" 
+               text="Password" color="0x888888FF" font="font:MediumSystemFont" vertAlign="center" />
       </Group>
 
-      <Label id="errorLabel" translation="[80,585]" width="680" height="60" visible="false" />
-
-      <Group id="signInBtn" translation="[160,645]">
-        <Rectangle id="btnBg" width="520" height="76" color="#EF6418" opacity="0.92" />
-        <Label id="btnText" translation="[0,18]" width="520" height="40" horizAlign="center" text="Sign In" />
+      <Group id="signInBtn" translation="[0, 380]">
+        <Rectangle id="btnBg" width="640" height="80" color="0x2A2A2AFF" />
+        <Rectangle id="btnFocusBg" width="656" height="96" translation="[-8,-8]" color="0xEF6418FF" visible="false" />
+        
+        <Label id="btnText" translation="[0, 20]" width="640" height="40" horizAlign="center" 
+               text="Log In" color="0xFFFFFFFF" font="font:MediumBoldSystemFont" vertAlign="center" />
       </Group>
+      
+      <Label id="errorLabel" translation="[0, 500]" width="640" height="60" visible="false" 
+             color="0xEF6418FF" wrap="true" numLines="2" horizAlign="center" font="font:MediumSystemFont" />
+
     </Group>
   </children>
 </component>

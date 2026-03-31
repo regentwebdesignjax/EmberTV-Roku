@@ -8,49 +8,44 @@
   </interface>
 
   <children>
-    <EmberTheme id="theme" />
+    
+    <Group id="scaleGroup" scaleRotateCenter="[135, 202]">
+        
+        <Rectangle 
+            id="focusRing"
+            width="282" 
+            height="417" 
+            translation="[-6, -6]" 
+            color="0xEBEBEBFF" 
+            visible="false" />
 
-    <Group id="focusGlow" visible="false">
-        <Rectangle 
-            width="286" 
-            height="416" 
-            translation="[-8, -8]" 
-            color="#EF6418" 
-            opacity="0.5" />
-            
-        <Rectangle 
-            width="278" 
-            height="408" 
-            translation="[-4, -4]" 
-            color="#EF6418" 
-            opacity="0.9" />
+        <Poster
+          id="poster"
+          width="270"
+          height="405"
+          translation="[0, 0]"
+          loadDisplayMode="scaleToFit" />
+
     </Group>
 
-    <Poster
-      id="poster"
-      width="270"
-      height="400"
-      loadWidth="270"
-      loadHeight="400"
-      loadDisplayMode="scaleToFit" />
-
     <Label
-      id="titleLabel"
-      translation="[0, 415]"
+      id="expirationLabel"
+      translation="[0, 420]"
       width="270"
-      height="28"
-      font="fontSmall"
-      color="#FFFFFF"
-      horizAlign="left"
-      ellipsizeOnBoundary="true" />
+      height="40"
+      color="0xAAAAAAFF"
+      horizAlign="center"
+      vertAlign="top"
+      wrap="false">
+      <Font role="font" uri="font:SystemFont" size="20" />
+    </Label>
 
-    <Label
-      id="metaLabel"
-      translation="[0, 448]"
-      width="270"
-      height="20"
-      font="fontSmall"
-      color="#AAAAAA"
-      horizAlign="left" />
+    <Animation id="focusAnim" duration="0.15" easeFunction="outQuad">
+        <Vector2DFieldInterpolator id="scaleInterp" 
+            key="[0.0, 1.0]" 
+            keyValue="[[1.0, 1.0], [1.06, 1.06]]" 
+            fieldToInterp="scaleGroup.scale" />
+    </Animation>
+
   </children>
 </component>

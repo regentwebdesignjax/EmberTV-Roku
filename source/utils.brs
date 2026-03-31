@@ -99,3 +99,27 @@ function EmberClearResume(filmId as String) as Void
     sec.Delete(filmId)
     sec.Flush()
 end function
+
+' ---- Auth Registry Helpers ----
+function EmberAuthSection() as Object
+    return CreateObject("roRegistrySection", "EmberAuth")
+end function
+
+function EmberSaveAuthToken(token as String) as Void
+    if token = invalid or token = "" then return
+    sec = EmberAuthSection()
+    sec.Write("authToken", token)
+    sec.Flush() 
+end function
+
+function EmberLoadAuthToken() as String
+    sec = EmberAuthSection()
+    if sec.Exists("authToken") then return sec.Read("authToken")
+    return ""
+end function
+
+function EmberClearAuthToken() as Void
+    sec = EmberAuthSection()
+    sec.Delete("authToken")
+    sec.Flush()
+end function

@@ -1,3 +1,5 @@
+' components/MainScene.brs
+
 sub init()
     m.loginScene   = m.top.findNode("loginScene")
     m.rentalsScene = m.top.findNode("rentalsScene")
@@ -16,7 +18,15 @@ sub init()
         m.playerScene.observeField("backRequested", "onPlayerBackRequested")
     end if
 
-    showOnly("login")
+    ' Check for a saved token on app launch
+    savedToken = EmberLoadAuthToken()
+    if savedToken <> "" then
+        ' If we have a token, bypass login and go straight to rentals
+        if m.loginScene <> invalid then m.loginScene.authToken = savedToken
+    else
+        showOnly("login")
+    end if
+    
     m.top.signalBeacon("AppLaunchComplete")
 end sub
 
@@ -37,6 +47,9 @@ sub onAuthTokenChanged()
     end if
 
     if token <> "" then
+        ' Save the token to the registry so they stay logged in
+        EmberSaveAuthToken(token)
+        
         if m.rentalsScene <> invalid then m.rentalsScene.authToken = token
         showOnly("rentals")
     else
@@ -74,7 +87,11 @@ sub onPlayerBackRequested()
 end sub
 
 sub onLogoutRequested()
+    ' Clear the token from the registry
+    EmberClearAuthToken()
+    
     if m.rentalsScene <> invalid then m.rentalsScene.authToken = ""
+    if m.loginScene <> invalid then m.loginScene.authToken = "" ' Reset login scene state
     showOnly("login")
 end sub
 
