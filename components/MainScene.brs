@@ -95,6 +95,18 @@ sub onLogoutRequested()
     showOnly("login")
 end sub
 
+function handleInstantResume(args as Dynamic) as Void
+    print "MainScene: Instant Resume received"
+    if m.playerScene <> invalid and m.playerScene.visible then
+        m.playerScene.setFocus(true)
+    else if m.rentalsScene <> invalid and m.rentalsScene.visible then
+        m.rentalsScene.setFocus(true)
+    else if m.loginScene <> invalid then
+        m.loginScene.setFocus(true)
+    end if
+    m.top.signalBeacon("AppLaunchComplete")
+end function
+
 ' ✅ REWRITTEN "NUCLEAR" DEEP LINK HANDLER
 sub handleDeepLink(params as Object)
     print "MainScene received deep link: "; params

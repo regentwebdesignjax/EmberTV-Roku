@@ -5,6 +5,7 @@
 
   <interface>
     <function name="handleDeepLink" />
+    <function name="handleInstantResume" />
   </interface>
 
   <children>
