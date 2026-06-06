@@ -12,15 +12,20 @@ sub Main(args as Dynamic)
     scene = screen.CreateScene("MainScene")
     screen.Show()
 
-    ' Handle Deep Linking at startup
-    if args <> invalid and args.contentId <> invalid and args.mediaType <> invalid
-        print "Deep Linking launch: "; args.contentId
-        inputData = { id: args.contentId, type: args.mediaType }
-        scene.callFunc("handleDeepLink", inputData)
+    ' Handle launch reason — Instant Resume vs normal/deep-link launch
+    if args <> invalid and args.reason = "instant_resume"
+        print "Instant Resume launch"
+        scene.callFunc("handleInstantResume", {})
+    else
+        ' Handle Deep Linking at startup
+        if args <> invalid and args.contentId <> invalid and args.mediaType <> invalid
+            print "Deep Linking launch: "; args.contentId
+            inputData = { id: args.contentId, type: args.mediaType }
+            scene.callFunc("handleDeepLink", inputData)
+        end if
+        ' Signal the beacon (Performance requirement)
+        scene.signalBeacon("AppLaunchComplete")
     end if
-    
-    ' Signal the beacon (Performance requirement)
-    scene.signalBeacon("AppLaunchComplete")
 
     while true
         msg = wait(0, m.port)
@@ -30,7 +35,10 @@ sub Main(args as Dynamic)
             
         ' Handle Input Events
         else if type(msg) = "roInputEvent"
-            if msg.isInput()
+            if msg.isInstantResume()
+                print "Instant Resume event"
+                scene.callFunc("handleInstantResume", {})
+            else if msg.isInput()
                 info = msg.getInfo()
                 if info.contentId <> invalid and info.mediaType <> invalid
                     print "Deep Linking event: "; info.contentId
