@@ -97,7 +97,11 @@ sub execute()
 
         ' 6. Meta
         if film.year <> invalid then item.year = film.year
-        if film.genre <> invalid then item.genre = film.genre
+        ' ContentNode has no built-in "genre" field, so declare it before setting
+        if film.genre <> invalid
+            item.addField("genre", "string", false)
+            item.genre = film.genre
+        end if
         if film.id <> invalid then item.id = film.id
 
         ' 7. RENTAL EXPIRATION MATH

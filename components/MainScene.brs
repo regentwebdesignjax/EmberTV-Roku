@@ -1,6 +1,8 @@
 ' components/MainScene.brs
 
 sub init()
+    m._launchSignaled = false
+
     m.loginScene   = m.top.findNode("loginScene")
     m.rentalsScene = m.top.findNode("rentalsScene")
     m.playerScene  = m.top.findNode("playerScene")
@@ -27,6 +29,14 @@ sub init()
         showOnly("login")
     end if
     
+    signalLaunchComplete()
+end sub
+
+' AppLaunchComplete must be signaled exactly once per launch -- Roku measures
+' launch time from it (cert 3.2) and warns on the console if it repeats.
+sub signalLaunchComplete()
+    if m._launchSignaled = true then return
+    m._launchSignaled = true
     m.top.signalBeacon("AppLaunchComplete")
 end sub
 
@@ -104,7 +114,7 @@ function handleInstantResume(args as Dynamic) as Void
     else if m.loginScene <> invalid then
         m.loginScene.setFocus(true)
     end if
-    m.top.signalBeacon("AppLaunchComplete")
+    signalLaunchComplete()
 end function
 
 ' Release what we can when the OS warns we are near the per-app memory limit.

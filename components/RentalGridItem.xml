@@ -23,6 +23,8 @@
           id="poster"
           width="270"
           height="405"
+          loadWidth="270"
+          loadHeight="405"
           translation="[0, 0]"
           loadDisplayMode="scaleToFit" />
 
