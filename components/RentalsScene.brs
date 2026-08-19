@@ -26,12 +26,29 @@ sub init()
 
     m._lastToken = ""
     m._focusState = "grid"
+    m._needsReload = false
     
     updateFocusVisuals()
 end sub
 
+' Called by MainScene when the OS warns we are near the memory limit. Only safe
+' to call while this scene is hidden; onVisibleChanged refetches on return.
+function releaseCachedContent(args as Dynamic) as Void
+    if m.grid <> invalid and m.grid.content <> invalid then
+        print "RentalsScene: releasing grid content"
+        m.grid.content = invalid
+        m._needsReload = true
+    end if
+end function
+
 sub onVisibleChanged()
     if m.top.visible = true then
+        ' Restore anything we gave back under memory pressure
+        if m._needsReload = true then
+            m._needsReload = false
+            loadRentals()
+        end if
+
         if m._focusState = "refresh" then
             if m.refreshBtn <> invalid then m.refreshBtn.setFocus(true)
         else if m._focusState = "logout" then
