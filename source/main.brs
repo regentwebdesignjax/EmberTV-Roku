@@ -14,6 +14,9 @@ sub Main(args as Dynamic)
     if m.memoryMonitor <> invalid
         m.memoryMonitor.setMessagePort(m.port)
         m.memoryMonitor.enableMemoryWarningEvent(true)
+        print "Memory: available(kb)="; m.memoryMonitor.GetChannelAvailableMemory()
+        limits = m.memoryMonitor.GetChannelMemoryLimit()
+        if limits <> invalid then print "Memory: limits="; FormatJSON(limits)
     end if
 
     scene = screen.CreateScene("MainScene")
@@ -30,8 +33,8 @@ sub Main(args as Dynamic)
             inputData = { id: args.contentId, type: args.mediaType }
             scene.callFunc("handleDeepLink", inputData)
         end if
-        ' Signal the beacon (Performance requirement)
-        scene.signalBeacon("AppLaunchComplete")
+        ' AppLaunchComplete is signaled by MainScene.init() -- signaling it here
+        ' too produced an "already signaled" warning on the console.
     end if
 
     while true
