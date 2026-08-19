@@ -87,5 +87,6 @@
     <field id="refreshNow" type="boolean" alwaysNotify="true" />
     <field id="selectedRental" type="node" alwaysNotify="true" />
     <field id="logoutRequested" type="boolean" alwaysNotify="true" />
+    <function name="releaseCachedContent" />
   </interface>
 </component>

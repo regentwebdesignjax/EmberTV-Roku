@@ -9,6 +9,13 @@ sub Main(args as Dynamic)
     input = CreateObject("roInput")
     input.setMessagePort(m.port)
 
+    ' Subscribe to low-memory warnings (required for certification)
+    m.memoryMonitor = CreateObject("roAppMemoryMonitor")
+    if m.memoryMonitor <> invalid
+        m.memoryMonitor.setMessagePort(m.port)
+        m.memoryMonitor.enableMemoryWarningEvent(true)
+    end if
+
     scene = screen.CreateScene("MainScene")
     screen.Show()
 
@@ -46,6 +53,17 @@ sub Main(args as Dynamic)
                     scene.callFunc("handleDeepLink", inputData)
                 end if
             end if
+
+        ' Handle low-memory warnings
+        else if type(msg) = "roAppMemoryNotificationEvent"
+            percent = -1
+            try
+                percent = msg.getUsagePercentage()
+            catch e
+                print "Memory event: could not read usage percentage"
+            end try
+            print "Low memory warning at "; percent; "% of app limit"
+            scene.callFunc("handleLowMemory", { percent: percent })
         end if
     end while
 end sub

@@ -107,6 +107,21 @@ function handleInstantResume(args as Dynamic) as Void
     m.top.signalBeacon("AppLaunchComplete")
 end function
 
+' Release what we can when the OS warns we are near the per-app memory limit.
+function handleLowMemory(params as Dynamic) as Void
+    percent = -1
+    if params <> invalid and params.percent <> invalid then percent = params.percent
+    print "MainScene: low memory at "; percent; "%"
+
+    ' While the player is up the rentals grid is off-screen, so its posters are
+    ' the cheapest thing to give back. RentalsScene refetches when shown again.
+    if m.playerScene <> invalid and m.playerScene.visible = true
+        if m.rentalsScene <> invalid
+            m.rentalsScene.callFunc("releaseCachedContent", {})
+        end if
+    end if
+end function
+
 ' ✅ REWRITTEN "NUCLEAR" DEEP LINK HANDLER
 sub handleDeepLink(params as Object)
     print "MainScene received deep link: "; params
