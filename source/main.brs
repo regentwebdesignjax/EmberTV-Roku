@@ -9,14 +9,22 @@ sub Main(args as Dynamic)
     input = CreateObject("roInput")
     input.setMessagePort(m.port)
 
-    ' Subscribe to low-memory warnings (required for certification)
+    ' Subscribe to per-app low-memory warnings (required for certification)
     m.memoryMonitor = CreateObject("roAppMemoryMonitor")
     if m.memoryMonitor <> invalid
         m.memoryMonitor.setMessagePort(m.port)
         m.memoryMonitor.enableMemoryWarningEvent(true)
         print "Memory: available(kb)="; m.memoryMonitor.GetChannelAvailableMemory()
+        print "Memory: limitPercent="; m.memoryMonitor.GetMemoryLimitPercent()
         limits = m.memoryMonitor.GetChannelMemoryLimit()
         if limits <> invalid then print "Memory: limits="; FormatJSON(limits)
+    end if
+
+    ' Subscribe to system-wide low-memory notifications (required for certification)
+    m.deviceInfo = CreateObject("roDeviceInfo")
+    if m.deviceInfo <> invalid
+        m.deviceInfo.setMessagePort(m.port)
+        m.deviceInfo.EnableLowGeneralMemoryEvent(true)
     end if
 
     scene = screen.CreateScene("MainScene")
@@ -67,6 +75,16 @@ sub Main(args as Dynamic)
             end try
             print "Low memory warning at "; percent; "% of app limit"
             scene.callFunc("handleLowMemory", { percent: percent })
+
+        ' Handle system-wide low-memory notifications
+        else if type(msg) = "roDeviceInfoEvent"
+            dinfo = msg.getInfo()
+            if dinfo <> invalid and dinfo.generalMemoryLevel <> invalid
+                print "General memory level: "; dinfo.generalMemoryLevel
+                if dinfo.generalMemoryLevel <> "normal"
+                    scene.callFunc("handleLowMemory", { level: dinfo.generalMemoryLevel })
+                end if
+            end if
         end if
     end while
 end sub

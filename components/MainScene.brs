@@ -119,9 +119,13 @@ end function
 
 ' Release what we can when the OS warns we are near the per-app memory limit.
 function handleLowMemory(params as Dynamic) as Void
-    percent = -1
-    if params <> invalid and params.percent <> invalid then percent = params.percent
-    print "MainScene: low memory at "; percent; "%"
+    if params <> invalid and params.percent <> invalid
+        print "MainScene: low memory at "; params.percent; "% of app limit"
+    else if params <> invalid and params.level <> invalid
+        print "MainScene: low memory, system level="; params.level
+    else
+        print "MainScene: low memory (no detail)"
+    end if
 
     ' While the player is up the rentals grid is off-screen, so its posters are
     ' the cheapest thing to give back. RentalsScene refetches when shown again.
