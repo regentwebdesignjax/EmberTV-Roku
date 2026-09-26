@@ -7,17 +7,20 @@
 
     <Poster 
       id="headerLogo"
-      translation="[30, 10]"
-      width="650"
-      height="180"
+      translation="[80, 30]"
+      width="360"
+      height="200"
       loadDisplayMode="scaleToFit"
       uri="pkg:/images/logo/logo_header.png" />
 
-    <Group translation="[960, 60]">
+    <!-- Full-width labels so the title and subtitle are centered on the screen. -->
+    <Group translation="[0, 60]">
       <Label
         id="titleLabel"
         text="My Rentals"
         color="0xFFFFFFFF"
+        width="1920"
+        height="70"
         horizAlign="center"
         translation="[0,0]">
         <Font role="font" uri="font:BoldSystemFontFile" size="54" />
@@ -27,8 +30,10 @@
         id="subtitleLabel"
         text="Your rentals, ready to watch."
         color="0xAAAAAAFF"
+        width="1920"
+        height="36"
         horizAlign="center"
-        translation="[0, 70]">
+        translation="[0, 76]">
         <Font role="font" uri="font:SystemFontFile" size="24" />
       </Label>
     </Group>
@@ -57,7 +62,7 @@
       </Group>
     </Group>
 
-    <Group id="focusedMetadata" translation="[80, 190]">
+    <Group id="focusedMetadata" translation="[80, 250]">
         <Label
             id="focusedTitle"
             text=""
@@ -70,7 +75,7 @@
 
     <MarkupGrid
       id="grid"
-      translation="[80, 260]"
+      translation="[80, 330]"
       itemSize="[270, 480]"
       itemSpacing="[40, 60]"
       numColumns="6"

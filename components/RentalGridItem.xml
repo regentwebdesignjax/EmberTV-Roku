@@ -39,7 +39,7 @@
       horizAlign="center"
       vertAlign="top"
       wrap="false">
-      <Font role="font" uri="font:SystemFont" size="20" />
+      <Font role="font" uri="font:SystemFontFile" size="24" />
     </Label>
 
     <Animation id="focusAnim" duration="0.15" easeFunction="outQuad">
