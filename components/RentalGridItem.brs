@@ -23,6 +23,12 @@ sub onItemContentChanged()
         end if
     end if
 
+    ' Ended rentals and upcoming screenings are shown dimmed.
+    if m.poster <> invalid then
+        m.poster.opacity = 1.0
+        if c.hasField("watchable") and c.watchable = false then m.poster.opacity = 0.4
+    end if
+
     ' 2. Expiration Label
     if m.expirationLabel <> invalid then
         if c.description <> invalid and c.description <> "" then 

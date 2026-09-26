@@ -1,14 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
 <component name="PlayerScene" extends="Group">
-  <script type="text/brightscript" uri="pkg:/source/utils.brs" />
   <script type="text/brightscript" uri="pkg:/components/PlayerScene.brs" />
 
   <interface>
+    <!-- Input: a rental from the library plus `startAt` (seconds; 0 = beginning). -->
     <field id="content" type="node" alwaysNotify="true" />
+    <!-- Output: the viewer left the player. -->
     <field id="backRequested" type="boolean" value="false" alwaysNotify="true" />
+    <!-- Output: the session was revoked while starting playback. -->
+    <field id="signedOut" type="boolean" alwaysNotify="true" />
   </interface>
 
   <children>
-    <Rectangle id="bg" width="1920" height="1080" color="#000000" />
+    <Rectangle id="bg" width="1920" height="1080" color="0x000000FF" />
 
     <Video
       id="video"
@@ -23,7 +27,23 @@
       height="60"
       visible="false"
       text=""
-      font="font:Large"
-      color="#FFFFFF" />
+      color="0xFFFFFFFF">
+      <Font role="font" uri="pkg:/fonts/AlbertSans-SemiBold.ttf" size="40" />
+    </Label>
+
+    <!-- Loading and error messages -->
+    <Group id="messageGroup" translation="[0, 470]" visible="false">
+      <Label id="messageTitle" width="1920" height="60" horizAlign="center"
+             text="" color="0xFFFFFFFF">
+        <Font role="font" uri="pkg:/fonts/AlbertSans-SemiBold.ttf" size="40" />
+      </Label>
+      <Label id="messageDetail" translation="[0, 70]" width="1920" height="50"
+             horizAlign="center" text="" color="0xAAAAAAFF">
+        <Font role="font" uri="pkg:/fonts/AlbertSans-Regular.ttf" size="30" />
+      </Label>
+    </Group>
+
+    <!-- Saves the resume point while playing. -->
+    <Timer id="heartbeat" duration="30" repeat="true" />
   </children>
 </component>

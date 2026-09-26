@@ -15,16 +15,20 @@ sub init()
     
     m.focusedTitle = m.top.findNode("focusedTitle")
 
+    m.messageGroup  = m.top.findNode("messageGroup")
+    m.messageTitle  = m.top.findNode("messageTitle")
+    m.messageDetail = m.top.findNode("messageDetail")
+
+    if m.task <> invalid then m.task.observeField("response", "onTaskResponse")
+
     if m.grid <> invalid then
         m.grid.observeField("itemSelected", "onGridItemSelected")
         m.grid.observeField("itemFocused", "onGridItemFocused")
     end if
 
-    m.top.observeField("authToken", "onAuthTokenChanged")
-    m.top.observeField("refreshNow", "onRefreshNowChanged")
+    m.top.observeField("reload", "onReloadChanged")
     m.top.observeField("visible", "onVisibleChanged")
 
-    m._lastToken = ""
     m._focusState = "grid"
     m._needsReload = false
     
@@ -60,47 +64,86 @@ sub onVisibleChanged()
     end if
 end sub
 
-sub onAuthTokenChanged()
-    token = m.top.authToken
-    if token = invalid then token = ""
-    if token = "" then return
-    if token = m._lastToken then return
-    m._lastToken = token
-
-    loadRentals()
-end sub
-
-sub onRefreshNowChanged()
-    if m.top.refreshNow = true then
-        m.top.refreshNow = false
-        loadRentals()
-    end if
+sub onReloadChanged()
+    if m.top.reload = true then loadRentals()
 end sub
 
 sub loadRentals()
     if m.task = invalid then return
-    m.task.observeField("status", "onTaskStatusChanged")
-    m.task.observeField("content", "onTaskContentChanged")
-    m.task.authToken = m.top.authToken
+    if m.grid = invalid or m.grid.content = invalid or m.grid.content.getChildCount() = 0 then
+        showMessage("Loading your library...", "")
+    end if
+    m.task.request = { action: "library" }
     m.task.control = "RUN"
 end sub
 
-sub onTaskStatusChanged()
-end sub
-
-sub onTaskContentChanged()
+sub onTaskResponse()
     if m.task = invalid then return
+    r = m.task.response
+    if r = invalid then return
+
+    if r.signedOut = true then
+        m.top.signedOut = true
+        return
+    end if
+
+    if r.ok <> true then
+        err = r.error
+        if err = invalid then err = ""
+        ' Keep showing what we have; only an empty screen gets the error.
+        if m.grid = invalid or m.grid.content = invalid or m.grid.content.getChildCount() = 0 then
+            showMessage("Couldn't load your library", err)
+            focusButtons()
+        end if
+        return
+    end if
+
     c = m.task.content
     if c = invalid then return
-
     if m.grid <> invalid then
         m.grid.content = c
         m.grid.jumpToItem = 0
-        if m.top.visible = true and m._focusState = "grid" then 
-            m.grid.setFocus(true)
-        end if
+    end if
+    m.top.library = c
+
+    if c.getChildCount() = 0 then
+        showMessage("Your library is empty", "Rentals on your Ember TV account will appear here.")
+        if m.focusedTitle <> invalid then m.focusedTitle.text = ""
+        focusButtons()
+        return
+    end if
+
+    hideMessage()
+    if m.top.visible = true and m._focusState = "grid" and m.grid <> invalid then
+        m.grid.setFocus(true)
     end if
 end sub
+
+sub showMessage(title as String, detail as String)
+    if m.messageGroup = invalid then return
+    m.messageTitle.text = title
+    m.messageDetail.text = detail
+    m.messageGroup.visible = true
+    if m.grid <> invalid then m.grid.visible = false
+end sub
+
+sub hideMessage()
+    if m.messageGroup <> invalid then m.messageGroup.visible = false
+    if m.grid <> invalid then m.grid.visible = true
+end sub
+
+' Nothing to select in the grid: park focus on Refresh.
+sub focusButtons()
+    if m._focusState <> "grid" then return
+    m._focusState = "refresh"
+    if m.top.visible = true and m.refreshBtn <> invalid then m.refreshBtn.setFocus(true)
+    updateFocusVisuals()
+end sub
+
+function gridIsEmpty() as Boolean
+    if m.grid = invalid or m.grid.content = invalid then return true
+    return m.grid.content.getChildCount() = 0
+end function
 
 sub onGridItemSelected()
     if m.grid = invalid then return
@@ -173,7 +216,9 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
         return false
 
     else if m._focusState = "refresh" then
-        if key = "down" then
+        if key = "down" and gridIsEmpty() then
+            return true
+        else if key = "down" then
             m._focusState = "grid"
             if m.grid <> invalid then m.grid.setFocus(true)
             updateFocusVisuals()
@@ -189,7 +234,9 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
         end if
 
     else if m._focusState = "logout" then
-        if key = "down" then
+        if key = "down" and gridIsEmpty() then
+            return true
+        else if key = "down" then
             m._focusState = "grid"
             if m.grid <> invalid then m.grid.setFocus(true)
             updateFocusVisuals()

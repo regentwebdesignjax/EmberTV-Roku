@@ -5,8 +5,6 @@
   <children>
     <Rectangle id="bg" width="1920" height="1080" color="0x121212FF" />
 
-    <EmberTheme id="theme" />
-
     <Poster 
       id="headerLogo"
       translation="[30, 10]"
@@ -19,18 +17,20 @@
       <Label
         id="titleLabel"
         text="My Rentals"
-        font="fontH1"
         color="0xFFFFFFFF"
         horizAlign="center"
-        translation="[0,0]" />
+        translation="[0,0]">
+        <Font role="font" uri="pkg:/fonts/AlbertSans-Bold.ttf" size="54" />
+      </Label>
       
       <Label
         id="subtitleLabel"
-        text="Your active 48-hour rentals, ready to watch."
-        font="fontSmall"
+        text="Your rentals, ready to watch."
         color="0xAAAAAAFF"
         horizAlign="center"
-        translation="[0, 70]" />
+        translation="[0, 70]">
+        <Font role="font" uri="pkg:/fonts/AlbertSans-Regular.ttf" size="24" />
+      </Label>
     </Group>
 
     <Group translation="[1450, 60]">
@@ -79,14 +79,29 @@
       drawFocusFeedback="false"
       itemComponentName="RentalGridItem" />
 
-    <RentalsTask id="rentalsTask" />
+    <!-- Loading, empty and error messages, shown in place of the grid. -->
+    <Group id="messageGroup" translation="[0, 480]" visible="false">
+      <Label id="messageTitle" width="1920" height="60" horizAlign="center"
+             text="" color="0xFFFFFFFF">
+        <Font role="font" uri="pkg:/fonts/AlbertSans-SemiBold.ttf" size="40" />
+      </Label>
+      <Label id="messageDetail" translation="[360, 70]" width="1200" height="100"
+             horizAlign="center" wrap="true" numLines="2" text="" color="0xAAAAAAFF">
+        <Font role="font" uri="pkg:/fonts/AlbertSans-Regular.ttf" size="30" />
+      </Label>
+    </Group>
+
+    <ApiTask id="rentalsTask" />
   </children>
 
   <interface>
-    <field id="authToken" type="string" />
-    <field id="refreshNow" type="boolean" alwaysNotify="true" />
+    <!-- Input: set true to (re)load the library. -->
+    <field id="reload" type="boolean" alwaysNotify="true" />
+    <!-- Outputs -->
+    <field id="library" type="node" alwaysNotify="true" />
     <field id="selectedRental" type="node" alwaysNotify="true" />
     <field id="logoutRequested" type="boolean" alwaysNotify="true" />
+    <field id="signedOut" type="boolean" alwaysNotify="true" />
     <function name="releaseCachedContent" />
   </interface>
 </component>

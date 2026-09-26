@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One Ember TV API call off the render thread. Set `request`, then control = "RUN". -->
+<component name="ApiTask" extends="Task">
+  <script type="text/brightscript" uri="pkg:/source/emberApi.brs" />
+  <script type="text/brightscript" uri="pkg:/components/ApiTask.brs" />
+
+  <interface>
+    <!-- { action: "library" | "playback" | "progress" | "passwordSignIn" | "signOut", ... } -->
+    <field id="request" type="assocarray" />
+    <!-- Set last, once the call is done: { ok, signedOut, error, url } -->
+    <field id="response" type="assocarray" alwaysNotify="true" />
+    <!-- action "library": the rentals, set before `response` -->
+    <field id="content" type="node" />
+  </interface>
+</component>

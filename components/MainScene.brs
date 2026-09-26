@@ -1,39 +1,53 @@
 ' components/MainScene.brs
+'
+' Moves between the screens: activation-code sign-in (or email sign-in),
+' My Rentals, and the player. Also handles deep links, Instant Resume and
+' low-memory warnings forwarded from main.brs.
+
+' Offer "Resume" once the viewer is at least this far in.
+function MinResumeSeconds() as Integer
+    return 60
+end function
 
 sub init()
     m._launchSignaled = false
+    m._dialogOpen = false
+    m._pendingDeepLink = ""
+    m._pendingRental = invalid
 
-    m.loginScene   = m.top.findNode("loginScene")
-    m.rentalsScene = m.top.findNode("rentalsScene")
-    m.playerScene  = m.top.findNode("playerScene")
+    m.activationScene = m.top.findNode("activationScene")
+    m.loginScene      = m.top.findNode("loginScene")
+    m.rentalsScene    = m.top.findNode("rentalsScene")
+    m.playerScene     = m.top.findNode("playerScene")
+    m.signOutTask     = m.top.findNode("signOutTask")
 
-    if m.rentalsScene <> invalid then
-        m.rentalsScene.observeField("selectedRental", "onSelectedRental")
-        m.rentalsScene.observeField("logoutRequested", "onLogoutRequested")
-    end if
+    m.activationScene.observeField("signedIn", "onSignedIn")
+    m.activationScene.observeField("emailRequested", "onEmailRequested")
+    m.loginScene.observeField("signedIn", "onSignedIn")
+    m.loginScene.observeField("backRequested", "onLoginBack")
+    m.rentalsScene.observeField("selectedRental", "onSelectedRental")
+    m.rentalsScene.observeField("logoutRequested", "onLogoutRequested")
+    m.rentalsScene.observeField("signedOut", "onSessionEnded")
+    m.rentalsScene.observeField("library", "onLibraryLoaded")
+    m.playerScene.observeField("backRequested", "onPlayerBackRequested")
+    m.playerScene.observeField("signedOut", "onSessionEnded")
+    m.signOutTask.observeField("response", "onSignOutDone")
 
-    if m.loginScene <> invalid then
-        m.loginScene.observeField("authToken", "onAuthTokenChanged")
-    end if
+    EmberClearLegacyState()
 
-    if m.playerScene <> invalid then
-        m.playerScene.observeField("backRequested", "onPlayerBackRequested")
-    end if
-
-    ' Check for a saved token on app launch
-    savedToken = EmberLoadAuthToken()
-    if savedToken <> "" then
-        ' If we have a token, bypass login and go straight to rentals
-        if m.loginScene <> invalid then m.loginScene.authToken = savedToken
+    if EmberHasSession() then
+        showRentals()
     else
-        showOnly("login")
+        ' Sign-in at launch: Roku excludes it from launch timing (cert 3.2).
+        m.top.signalBeacon("AppDialogInitiate")
+        m._dialogOpen = true
+        showActivation()
     end if
-    
+
     signalLaunchComplete()
 end sub
 
-' AppLaunchComplete must be signaled exactly once per launch -- Roku measures
-' launch time from it (cert 3.2) and warns on the console if it repeats.
+' AppLaunchComplete must be signaled exactly once per launch.
 sub signalLaunchComplete()
     if m._launchSignaled = true then return
     m._launchSignaled = true
@@ -41,78 +55,211 @@ sub signalLaunchComplete()
 end sub
 
 sub showOnly(which as String)
-    if m.loginScene <> invalid then m.loginScene.visible = (which = "login")
-    if m.rentalsScene <> invalid then m.rentalsScene.visible = (which = "rentals")
-    if m.playerScene <> invalid then m.playerScene.visible = (which = "player")
+    m.activationScene.visible = (which = "activation")
+    m.loginScene.visible = (which = "login")
+    m.rentalsScene.visible = (which = "rentals")
+    m.playerScene.visible = (which = "player")
 
-    if which = "login" and m.loginScene <> invalid then m.loginScene.setFocus(true)
-    if which = "rentals" and m.rentalsScene <> invalid then m.rentalsScene.setFocus(true)
-    if which = "player" and m.playerScene <> invalid then m.playerScene.setFocus(true)
+    if which = "activation" then m.activationScene.setFocus(true)
+    if which = "login" then m.loginScene.setFocus(true)
+    if which = "rentals" then m.rentalsScene.setFocus(true)
+    if which = "player" then m.playerScene.setFocus(true)
 end sub
 
-sub onAuthTokenChanged()
-    token = ""
-    if m.loginScene <> invalid and m.loginScene.authToken <> invalid then
-        token = m.loginScene.authToken
-    end if
+' ---- Sign-in ----
 
-    if token <> "" then
-        ' Save the token to the registry so they stay logged in
-        EmberSaveAuthToken(token)
-        
-        if m.rentalsScene <> invalid then m.rentalsScene.authToken = token
-        showOnly("rentals")
-    else
-        showOnly("login")
-    end if
+sub showActivation()
+    showOnly("activation")
+    m.activationScene.start = true
 end sub
 
-sub onSelectedRental()
-    if m.rentalsScene = invalid then return
-    item = m.rentalsScene.selectedRental
-    if item = invalid then return
-
-    if item.streamFormat = invalid or item.streamFormat = "" then
-        item.streamFormat = "hls"
-    end if
-
-    playContent(item)
+sub onEmailRequested()
+    if m.activationScene.emailRequested <> true then return
+    showOnly("login")
 end sub
 
-sub playContent(item as Object)
-    if m.playerScene <> invalid then
-        m.playerScene.backRequested = false
-        m.playerScene.content = item
-    end if
-    showOnly("player")
+sub onLoginBack()
+    if m.loginScene.backRequested <> true then return
+    showActivation()
 end sub
 
-sub onPlayerBackRequested()
-    if m.playerScene = invalid then return
-
-    if m.playerScene.backRequested = true then
-        m.playerScene.backRequested = false
-        showOnly("rentals")
+sub onSignedIn()
+    m.activationScene.stop = true
+    if m._dialogOpen then
+        m._dialogOpen = false
+        m.top.signalBeacon("AppDialogComplete")
     end if
+    showRentals()
+end sub
+
+sub showRentals()
+    showOnly("rentals")
+    m.rentalsScene.reload = true
+end sub
+
+' The server revoked the session (or it expired for good): sign in again.
+sub onSessionEnded()
+    closeDialog()
+    m.playerScene.content = invalid
+    showActivation()
 end sub
 
 sub onLogoutRequested()
-    ' Clear the token from the registry
-    EmberClearAuthToken()
-    
-    if m.rentalsScene <> invalid then m.rentalsScene.authToken = ""
-    if m.loginScene <> invalid then m.loginScene.authToken = "" ' Reset login scene state
-    showOnly("login")
+    if m.rentalsScene.logoutRequested <> true then return
+    m.signOutTask.request = { action: "signOut" }
+    m.signOutTask.control = "RUN"
+end sub
+
+sub onSignOutDone()
+    showActivation()
+end sub
+
+' ---- Library and playback ----
+
+sub onLibraryLoaded()
+    if m._pendingDeepLink = "" then return
+    id = m._pendingDeepLink
+    m._pendingDeepLink = ""
+    playFromLibrary(id)
+end sub
+
+sub onSelectedRental()
+    item = m.rentalsScene.selectedRental
+    if item = invalid then return
+    openRental(item)
+end sub
+
+' Plays a rental, asking first whether to resume when there is a resume point.
+sub openRental(item as Object)
+    if item.hasField("watchable") and item.watchable <> true then
+        message = "This rental has ended."
+        if item.hasField("upcoming") and item.upcoming = true then message = "This screening isn't available to play yet."
+        showMessageDialog(item.title, message)
+        return
+    end if
+
+    resume = 0
+    if item.hasField("resumeSeconds") and item.resumeSeconds <> invalid then resume = item.resumeSeconds
+    if resume >= MinResumeSeconds() and not nearEnd(item, resume) then
+        m._pendingRental = item
+        dlg = CreateObject("roSGNode", "StandardMessageDialog")
+        dlg.title = item.title
+        dlg.message = ["Resume from " + EmberFormatClock(resume) + ", or start from the beginning?"]
+        dlg.buttons = ["Resume", "Start Over"]
+        dlg.observeField("buttonSelected", "onResumeChoice")
+        dlg.observeField("wasClosed", "onDialogClosed")
+        m.top.dialog = dlg
+        return
+    end if
+    playRental(item, 0)
+end sub
+
+' Within the last minute: the film was essentially finished.
+function nearEnd(item as Object, seconds as Integer) as Boolean
+    if not item.hasField("durationMinutes") then return false
+    minutes = item.durationMinutes
+    if minutes = invalid or minutes <= 0 then return false
+    return seconds > minutes * 60 - 60
+end function
+
+sub onResumeChoice()
+    dlg = m.top.dialog
+    item = m._pendingRental
+    m._pendingRental = invalid
+    if dlg = invalid or item = invalid then return
+    choice = dlg.buttonSelected
+    closeDialog()
+    if choice = 0 then
+        playRental(item, item.resumeSeconds)
+    else
+        playRental(item, 0)
+    end if
+end sub
+
+sub showMessageDialog(title as String, message as String)
+    dlg = CreateObject("roSGNode", "StandardMessageDialog")
+    dlg.title = title
+    dlg.message = [message]
+    dlg.buttons = ["OK"]
+    dlg.observeField("buttonSelected", "onDialogClosed")
+    dlg.observeField("wasClosed", "onDialogClosed")
+    m.top.dialog = dlg
+end sub
+
+sub onDialogClosed()
+    m._pendingRental = invalid
+    closeDialog()
+end sub
+
+sub closeDialog()
+    if m.top.dialog <> invalid then m.top.dialog.close = true
+    m.top.dialog = invalid
+end sub
+
+sub playRental(item as Object, startAt as Integer)
+    c = CreateObject("roSGNode", "ContentNode")
+    c.title = item.title
+    c.addFields({ filmId: item.filmId, startAt: startAt })
+    m.playerScene.backRequested = false
+    showOnly("player")
+    m.playerScene.content = c
+end sub
+
+sub onPlayerBackRequested()
+    if m.playerScene.backRequested <> true then return
+    m.playerScene.backRequested = false
+    ' Reload so time left and resume points are current.
+    showRentals()
+end sub
+
+' ---- Deep links ----
+
+' params: { id, type } from main.brs. The id is a film's id or slug; the film
+' plays if it is in this account's library and watchable. Signed out, it
+' plays after sign-in, exactly as a customer would see it.
+sub handleDeepLink(params as Object)
+    if params = invalid then return
+    id = ""
+    if params.id <> invalid then
+        id = params.id.ToStr()
+    else if params.contentId <> invalid then
+        id = params.contentId.ToStr()
+    end if
+    if id = "" then return
+    print "MainScene: deep link "; id
+
+    closeDialog()
+    m._pendingDeepLink = id
+    if EmberHasSession() then
+        ' Stop anything playing and look the film up in a fresh library.
+        m.playerScene.content = invalid
+        showRentals()
+    end if
+end sub
+
+sub playFromLibrary(id as String)
+    library = m.rentalsScene.library
+    if library = invalid then return
+    for i = 0 to library.getChildCount() - 1
+        item = library.getChild(i)
+        if item.filmId = id or (item.hasField("slug") and item.slug = id) then
+            openRental(item)
+            return
+        end if
+    end for
+    ' Not rented on this account: stay on My Rentals.
 end sub
 
 function handleInstantResume(args as Dynamic) as Void
     print "MainScene: Instant Resume received"
-    if m.playerScene <> invalid and m.playerScene.visible then
+    if m.playerScene.visible then
         m.playerScene.setFocus(true)
-    else if m.rentalsScene <> invalid and m.rentalsScene.visible then
+    else if m.rentalsScene.visible then
         m.rentalsScene.setFocus(true)
-    else if m.loginScene <> invalid then
+    else if m.loginScene.visible then
         m.loginScene.setFocus(true)
+    else
+        m.activationScene.setFocus(true)
     end if
     signalLaunchComplete()
 end function
@@ -123,58 +270,11 @@ function handleLowMemory(params as Dynamic) as Void
         print "MainScene: low memory at "; params.percent; "% of app limit"
     else if params <> invalid and params.level <> invalid
         print "MainScene: low memory, system level="; params.level
-    else
-        print "MainScene: low memory (no detail)"
     end if
 
     ' While the player is up the rentals grid is off-screen, so its posters are
     ' the cheapest thing to give back. RentalsScene refetches when shown again.
-    if m.playerScene <> invalid and m.playerScene.visible = true
-        if m.rentalsScene <> invalid
-            m.rentalsScene.callFunc("releaseCachedContent", {})
-        end if
+    if m.playerScene.visible = true then
+        m.rentalsScene.callFunc("releaseCachedContent", {})
     end if
 end function
-
-' ✅ REWRITTEN "NUCLEAR" DEEP LINK HANDLER
-sub handleDeepLink(params as Object)
-    print "MainScene received deep link: "; params
-    
-    if params <> invalid
-        ' 1. Robust ID Extraction
-        ' (Check both 'id' and 'contentId' just in case the dashboard sends it differently)
-        idString = ""
-        
-        if params.id <> invalid then 
-            idString = params.id.ToStr()
-        else if params.contentId <> invalid then 
-            idString = params.contentId.ToStr()
-        end if
-        
-        print "Processed Deep Link ID: "; idString
-        
-        ' 2. CERTIFICATION MODE: ACTIVATED
-        ' If the ID is "1234", we FORCE the app to switch to the video player instantly.
-        if idString = "1234"
-            print "Certification Mode: Bypassing login to play test video..."
-            
-            dummy = CreateObject("roSGNode", "ContentNode")
-            ' Using a high-reliability HTTPS test stream (Big Buck Bunny)
-            dummy.url = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-            dummy.streamFormat = "hls"
-            dummy.title = "Deep Link Certification Test"
-            
-            ' Force the Login Screen to hide so it can't steal focus back
-            if m.loginScene <> invalid then m.loginScene.visible = false
-            
-            ' Launch the player
-            playContent(dummy)
-            return
-        end if
-        
-        ' 3. Standard Logic (Only runs if ID is NOT 1234)
-        if m.rentalsScene <> invalid and m.rentalsScene.authToken <> ""
-            showOnly("rentals")
-        end if
-    end if
-end sub

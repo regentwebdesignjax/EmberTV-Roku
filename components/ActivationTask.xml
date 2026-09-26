@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Sign in with an activation code: fetches a code, publishes it in `code`,
+  then polls until the viewer approves it (status "approved"), fetching a new
+  code whenever one expires. Set `cancel` = true to stop.
+-->
+<component name="ActivationTask" extends="Task">
+  <script type="text/brightscript" uri="pkg:/source/emberApi.brs" />
+  <script type="text/brightscript" uri="pkg:/components/ActivationTask.brs" />
+
+  <interface>
+    <field id="cancel" type="boolean" value="false" />
+    <!-- { userCode, qrUrl } -->
+    <field id="code" type="assocarray" alwaysNotify="true" />
+    <!-- "starting" | "waiting" | "approved" | "error" -->
+    <field id="status" type="string" value="idle" alwaysNotify="true" />
+    <field id="error" type="string" value="" />
+  </interface>
+</component>
