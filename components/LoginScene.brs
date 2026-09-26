@@ -17,7 +17,7 @@ sub init()
 
     m.loginTask = m.top.findNode("loginTask")
     if m.loginTask <> invalid then
-        m.loginTask.observeField("status", "onLoginTaskStatus")
+        m.loginTask.observeField("response", "onLoginResponse")
     end if
 
     m._email = ""
@@ -34,8 +34,6 @@ sub init()
 
     m.top.observeField("visible", "onVisibleChanged")
     if m.focusTimer <> invalid then m.focusTimer.observeField("fire", "onFocusTimerFire")
-    
-    m.top.signalBeacon("AppDialogInitiate")
 end sub
 
 sub onVisibleChanged()
@@ -43,6 +41,9 @@ sub onVisibleChanged()
     
     resetLoading()
     hideError()
+    m._pass = ""
+    m.selectedIndex = 0
+    renderFields()
 
     if m.focusTimer <> invalid then
         m.focusTimer.control = "stop"
@@ -61,6 +62,11 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
     if m._kbd <> invalid then return false
     
     if m.isLoading = true then return true
+
+    if key = "back" then
+        m.top.backRequested = true
+        return true
+    end if
 
     if key = "down" then
         if m.selectedIndex < 2 then m.selectedIndex = m.selectedIndex + 1
@@ -250,43 +256,34 @@ sub attemptLogin()
     end if
 
     m.isLoading = true
-    if m.btnText <> invalid then m.btnText.text = "Logging In…"
+    if m.btnText <> invalid then m.btnText.text = "Signing In..."
     if m.btnFocusBg <> invalid then m.btnFocusBg.opacity = 0.5
 
     if m.loginTask <> invalid then
-        m.loginTask.email = m._email
-        m.loginTask.password = m._pass
-        m.loginTask.control = "run"
+        m.loginTask.request = { action: "passwordSignIn", email: m._email, password: m._pass }
+        m.loginTask.control = "RUN"
     end if
 end sub
 
-sub onLoginTaskStatus()
+sub onLoginResponse()
     if m.loginTask = invalid then return
-    s = m.loginTask.status
-    if s = "success" then
-        token = m.loginTask.token
-        if token <> invalid and token <> "" then
-            m.top.authToken = token
-            m.top.loginSuccess = true
-            m.top.signalBeacon("AppDialogComplete")
-            return
-        end if
-        showError("Missing token.")
+    r = m.loginTask.response
+    if r = invalid then return
+    if r.ok = true then
+        m._pass = ""
         resetLoading()
+        m.top.signedIn = true
         return
     end if
-    if s = "error" then
-        err = m.loginTask.error
-        if err = invalid or err = "" then err = "Unable to sign in."
-        showError(err)
-        resetLoading()
-        return
-    end if
+    err = r.error
+    if err = invalid or err = "" then err = "Unable to sign in."
+    showError(err)
+    resetLoading()
 end sub
 
 sub resetLoading()
     m.isLoading = false
-    if m.btnText <> invalid then m.btnText.text = "Log In"
+    if m.btnText <> invalid then m.btnText.text = "Sign In"
     if m.btnFocusBg <> invalid then m.btnFocusBg.opacity = 1.0
 end sub
 
