@@ -39,18 +39,20 @@ sub onItemContentChanged()
     end if
 end sub
 
-sub onFocusPercentChanged()
+sub onFocusChanged()
     if m.focusRing = invalid then return
-    
-    ' Drive the animation frame based on the focus percent
-    m.scaleInterp.fraction = m.top.focusPercent
 
-    ' Show crisp border and turn text orange when item is focused
-    if m.top.focusPercent > 0.5 then
+    ' Only the poster the viewer is on, and only while the grid has focus
+    ' (not while they're on Refresh or Sign Out).
+    fraction = m.top.focusPercent
+    if m.top.gridHasFocus <> true then fraction = 0
+    if m.scaleInterp <> invalid then m.scaleInterp.fraction = fraction
+
+    if fraction > 0.5 then
         m.focusRing.visible = true
-        m.expirationLabel.color = "0xEF6418FF" ' EmberTV Orange
+        m.expirationLabel.color = "0xEF6418FF" ' Ember TV orange
     else
         m.focusRing.visible = false
-        m.expirationLabel.color = "0xAAAAAAFF" ' Dimmed Grey
+        m.expirationLabel.color = "0xAAAAAAFF"
     end if
 end sub
