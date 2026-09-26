@@ -24,40 +24,40 @@
 
     <Label id="title" translation="[130, 320]" width="1000" height="80"
            text="Sign in to Ember TV" color="0xFFFFFFFF">
-      <Font role="font" uri="pkg:/fonts/AlbertSans-Bold.ttf" size="60" />
+      <Font role="font" uri="font:BoldSystemFontFile" size="60" />
     </Label>
 
     <Group id="steps" translation="[130, 430]">
       <Label id="step1" translation="[0, 0]" width="1000" height="50"
              text="1.  On your phone or computer, go to" color="0xFFFFFFFF">
-        <Font role="font" uri="pkg:/fonts/AlbertSans-Regular.ttf" size="34" />
+        <Font role="font" uri="font:SystemFontFile" size="34" />
       </Label>
       <Label id="urlLabel" translation="[46, 52]" width="1000" height="56"
              text="" color="0xEF6418FF">
-        <Font role="font" uri="pkg:/fonts/AlbertSans-SemiBold.ttf" size="40" />
+        <Font role="font" uri="font:BoldSystemFontFile" size="40" />
       </Label>
       <Label id="step2" translation="[0, 130]" width="1000" height="50"
              text="2.  Sign in to your Ember TV account" color="0xFFFFFFFF">
-        <Font role="font" uri="pkg:/fonts/AlbertSans-Regular.ttf" size="34" />
+        <Font role="font" uri="font:SystemFontFile" size="34" />
       </Label>
       <Label id="step3" translation="[0, 200]" width="1000" height="50"
              text="3.  Enter this code:" color="0xFFFFFFFF">
-        <Font role="font" uri="pkg:/fonts/AlbertSans-Regular.ttf" size="34" />
+        <Font role="font" uri="font:SystemFontFile" size="34" />
       </Label>
       <Rectangle id="codeBox" translation="[46, 262]" width="480" height="110" color="0x222222FF" />
       <Label id="codeLabel" translation="[46, 262]" width="480" height="110"
              horizAlign="center" vertAlign="center" text="" color="0xFFFFFFFF">
-        <Font role="font" uri="pkg:/fonts/AlbertSans-Bold.ttf" size="66" />
+        <Font role="font" uri="font:BoldSystemFontFile" size="66" />
       </Label>
       <Label id="statusLabel" translation="[46, 392]" width="900" height="44"
              text="" color="0xAAAAAAFF">
-        <Font role="font" uri="pkg:/fonts/AlbertSans-Regular.ttf" size="28" />
+        <Font role="font" uri="font:SystemFontFile" size="28" />
       </Label>
     </Group>
 
     <Label id="errorLabel" translation="[130, 430]" width="1000" height="200"
            wrap="true" numLines="3" visible="false" text="" color="0xFFFFFFFF">
-      <Font role="font" uri="pkg:/fonts/AlbertSans-Regular.ttf" size="34" />
+      <Font role="font" uri="font:SystemFontFile" size="34" />
     </Label>
 
     <Group id="qrGroup" translation="[1250, 250]" visible="false">
@@ -66,7 +66,7 @@
               loadDisplayMode="scaleToFit" />
       <Label translation="[0, 545]" width="520" height="44" horizAlign="center"
              text="Or scan with your phone" color="0xAAAAAAFF">
-        <Font role="font" uri="pkg:/fonts/AlbertSans-Regular.ttf" size="28" />
+        <Font role="font" uri="font:SystemFontFile" size="28" />
       </Label>
     </Group>
 
@@ -75,14 +75,14 @@
         <Rectangle id="retryFill" width="300" height="72" color="0x2A2A2AFF" />
         <Label id="retryLabel" width="300" height="72" horizAlign="center" vertAlign="center"
                text="Try Again" color="0xFFFFFFFF">
-          <Font role="font" uri="pkg:/fonts/AlbertSans-SemiBold.ttf" size="30" />
+          <Font role="font" uri="font:BoldSystemFontFile" size="30" />
         </Label>
       </Group>
       <Group id="emailBtn">
         <Rectangle id="emailFill" width="460" height="72" color="0x2A2A2AFF" />
         <Label id="emailLabel" width="460" height="72" horizAlign="center" vertAlign="center"
                text="Sign in with email instead" color="0xFFFFFFFF">
-          <Font role="font" uri="pkg:/fonts/AlbertSans-SemiBold.ttf" size="30" />
+          <Font role="font" uri="font:BoldSystemFontFile" size="30" />
         </Label>
       </Group>
     </Group>
