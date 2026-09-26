@@ -130,7 +130,9 @@ sub onSelectedRental()
 end sub
 
 ' Plays a rental, asking first whether to resume when there is a resume point.
-sub openRental(item as Object)
+' A deep link ([direct]) plays straight away, from the resume point if any:
+' Roku expects deep links to go directly to playback, with no prompt.
+sub openRental(item as Object, direct = false as Boolean)
     if item.hasField("watchable") and item.watchable <> true then
         message = "This rental has ended."
         if item.hasField("upcoming") and item.upcoming = true then message = "This screening isn't available to play yet."
@@ -140,7 +142,16 @@ sub openRental(item as Object)
 
     resume = 0
     if item.hasField("resumeSeconds") and item.resumeSeconds <> invalid then resume = item.resumeSeconds
-    if resume >= MinResumeSeconds() and not nearEnd(item, resume) then
+    canResume = resume >= MinResumeSeconds() and not nearEnd(item, resume)
+    if direct then
+        if canResume then
+            playRental(item, resume)
+        else
+            playRental(item, 0)
+        end if
+        return
+    end if
+    if canResume then
         m._pendingRental = item
         dlg = CreateObject("roSGNode", "StandardMessageDialog")
         dlg.title = item.title
@@ -243,7 +254,7 @@ sub playFromLibrary(id as String)
     for i = 0 to library.getChildCount() - 1
         item = library.getChild(i)
         if item.filmId = id or (item.hasField("slug") and item.slug = id) then
-            openRental(item)
+            openRental(item, true)
             return
         end if
     end for

@@ -1,0 +1,17 @@
+params:
+    rasp_version: 1
+    default_keypress_wait: 2
+    channels:
+        EmberTV: dev
+steps:
+    - launch:
+          channel_name: EmberTV
+          content_id: the-apocalypse-of-st-john
+          media_type: movie
+          query: options.contentID=the-apocalypse-of-st-john&mediatype=movie
+    - pause: 15
+    - press: back
+    - pause: 5
+    - press: up
+    - press: right
+    - press: ok

@@ -26,3 +26,18 @@ The Ember TV Roku channel, written in BrightScript / SceneGraph, with its logos,
    `fonts/` at the top level of the zip, not inside another folder).
 3. Open `http://<roku-ip>` in a browser, sign in with the developer password, and upload
    the zip.
+
+## Roku certification
+
+`certification/Login.rasp` and `certification/Logout.rasp` are the automated test scripts
+for Roku's review. `script-login` and `script-password` are placeholders Roku fills in with
+the test account entered in the developer dashboard.
+
+- **Login:** launches with a deep link to *The Apocalypse of St. John*, chooses
+  "Sign in with email instead", types the email and password, signs in, and the deep-linked
+  film plays (the test account must have an active rental of it).
+- **Logout:** launches signed in with the same deep link (the film plays), presses Back to
+  My Rentals, then Up to Refresh, Right to Sign Out, OK.
+
+Deep links play straight away (from the resume point if there is one), with no Resume /
+Start Over prompt, as Roku requires.
