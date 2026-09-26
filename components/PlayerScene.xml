@@ -28,18 +28,18 @@
       visible="false"
       text=""
       color="0xFFFFFFFF">
-      <Font role="font" uri="pkg:/fonts/AlbertSans-SemiBold.ttf" size="40" />
+      <Font role="font" uri="font:BoldSystemFontFile" size="40" />
     </Label>
 
     <!-- Loading and error messages -->
     <Group id="messageGroup" translation="[0, 470]" visible="false">
       <Label id="messageTitle" width="1920" height="60" horizAlign="center"
              text="" color="0xFFFFFFFF">
-        <Font role="font" uri="pkg:/fonts/AlbertSans-SemiBold.ttf" size="40" />
+        <Font role="font" uri="font:BoldSystemFontFile" size="40" />
       </Label>
       <Label id="messageDetail" translation="[0, 70]" width="1920" height="50"
              horizAlign="center" text="" color="0xAAAAAAFF">
-        <Font role="font" uri="pkg:/fonts/AlbertSans-Regular.ttf" size="30" />
+        <Font role="font" uri="font:SystemFontFile" size="30" />
       </Label>
     </Group>
 
