@@ -7,7 +7,10 @@ The Ember TV Roku channel, written in BrightScript / SceneGraph, with its logos,
 - **Sign-in:** the channel shows a short code and a QR code. The viewer approves it at
   app.emberstreaming.com/activate on a phone or computer, and the Roku signs in on its own
   (`ActivationScene`, `ActivationTask`). "Sign in with email instead" opens an email and
-  password form (`LoginScene`) for the same account.
+  password form (`LoginScene`) for the same account. Roku requires sign-in on the device,
+  so this form stays. It posts to the web app's `/v2/auth/password` (not Supabase directly):
+  Supabase requires a CAPTCHA for password sign-ins, which a TV can't show, and the web app
+  checks the password with rate limits instead.
 - **Server:** everything talks to the Ember TV API v2 at `https://app.emberstreaming.com/v2`
   (`source/emberApi.brs`). The session (access + refresh token) is kept in the registry and
   refreshed before it expires.

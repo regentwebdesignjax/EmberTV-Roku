@@ -13,7 +13,8 @@ function EmberConfig() as Object
     return {
         ' The Ember TV web app. Every /v2 route lives under it.
         apiBaseUrl: "https://app.emberstreaming.com/"
-        ' Supabase project, used only to refresh and end the sign-in session.
+        ' Supabase project, used only to refresh and end the sign-in session
+        ' (sign-in itself goes through the web app).
         supabaseUrl: "https://bqdoxfeuhfzljvddpjbd.supabase.co/"
         ' Publishable key: public by design (the website ships the same one).
         supabaseKey: "sb_publishable_dDyGlDF2w0gvX1bJbz_knw_xVt4U6Lp"
@@ -225,10 +226,14 @@ end function
 
 ' ---- Email and password (for viewers who'd rather type) ----
 
+' Through the web app, not Supabase Auth directly: Supabase now requires a
+' CAPTCHA for password sign-ins, which a TV can't show. /v2/auth/password
+' checks the password the same way, with rate limits instead of a CAPTCHA,
+' and answers with an ordinary session.
 ' { ok, error }
 function EmberPasswordSignIn(email as String, password as String) as Object
     cfg = EmberConfig()
-    resp = EmberHttp("POST", cfg.supabaseUrl + "auth/v1/token?grant_type=password", { email: email, password: password }, { apikey: cfg.supabaseKey })
+    resp = EmberHttp("POST", cfg.apiBaseUrl + "v2/auth/password", { email: email, password: password }, {})
     data = resp.data
     if resp.status = 200 and type(data) = "roAssociativeArray" then
         if data.access_token <> invalid and data.refresh_token <> invalid then
@@ -238,6 +243,10 @@ function EmberPasswordSignIn(email as String, password as String) as Object
     end if
     if resp.status = 400 or resp.status = 401 then
         return { ok: false, error: "That email and password don't match an Ember TV account." }
+    end if
+    ' Suspended, unconfirmed or too many tries: the server's message says what to do.
+    if resp.status = 403 or resp.status = 429 then
+        return { ok: false, error: EmberErrorMessage(resp, "Sign-in failed. Please try again in a moment.") }
     end if
     if resp.status <= 0 then return { ok: false, error: EmberErrorMessage(resp, "") }
     return { ok: false, error: "Sign-in failed. Please try again in a moment." }
