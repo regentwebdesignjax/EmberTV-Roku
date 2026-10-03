@@ -18,5 +18,14 @@
     <PlayerScene     id="playerScene"     visible="false" />
 
     <ApiTask id="signOutTask" />
+
+    <!-- Shown only in staging builds (tools/make-staging-zip.sh), never over the player. -->
+    <Group id="stagingBadge" visible="false" translation="[1640, 36]">
+      <Rectangle width="220" height="52" color="0xFFD60AFF" />
+      <Label width="220" height="52" horizAlign="center" vertAlign="center"
+             text="STAGING" color="0x000000FF">
+        <Font role="font" uri="font:BoldSystemFontFile" size="30" />
+      </Label>
+    </Group>
   </children>
 </component>

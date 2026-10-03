@@ -30,6 +30,7 @@ end sub
 
 ' Shown on screen, so no scheme. Matches EmberConfig().websiteDisplayName.
 function EmberWebsiteName() as String
+    if CreateObject("roAppInfo").GetValue("ember_env") = "staging" then return "staging--embertv.netlify.app"
     return "app.emberstreaming.com"
 end function
 
