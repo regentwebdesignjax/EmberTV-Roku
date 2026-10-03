@@ -9,7 +9,24 @@
 ' nodes (ApiTask, ActivationTask), never on the render thread -- except the
 ' registry helpers, which are safe anywhere.
 
+' True when this channel was packaged by tools/make-staging-zip.sh, which adds
+' ember_env=staging to the manifest. The manifest in the repo has no such key,
+' so store builds always talk to production.
+function EmberIsStaging() as Boolean
+    return CreateObject("roAppInfo").GetValue("ember_env") = "staging"
+end function
+
 function EmberConfig() as Object
+    if EmberIsStaging() then
+        ' Staging site and Supabase project; rentals are paid with Stripe test cards.
+        return {
+            apiBaseUrl: "https://staging--embertv.netlify.app/"
+            supabaseUrl: "https://tfnyowkprvmmkyckipya.supabase.co/"
+            supabaseKey: "sb_publishable_P8c7Sb8DX51GiTuWA6GEPA_0XB-WrIu"
+            client: "roku"
+            websiteDisplayName: "staging--embertv.netlify.app"
+        }
+    end if
     return {
         ' The Ember TV web app. Every /v2 route lives under it.
         apiBaseUrl: "https://app.emberstreaming.com/"

@@ -20,6 +20,8 @@ sub init()
     m.rentalsScene    = m.top.findNode("rentalsScene")
     m.playerScene     = m.top.findNode("playerScene")
     m.signOutTask     = m.top.findNode("signOutTask")
+    m.stagingBadge    = m.top.findNode("stagingBadge")
+    m._isStaging      = EmberIsStaging()
 
     m.activationScene.observeField("signedIn", "onSignedIn")
     m.activationScene.observeField("emailRequested", "onEmailRequested")
@@ -59,6 +61,7 @@ sub showOnly(which as String)
     m.loginScene.visible = (which = "login")
     m.rentalsScene.visible = (which = "rentals")
     m.playerScene.visible = (which = "player")
+    m.stagingBadge.visible = m._isStaging and which <> "player"
 
     if which = "activation" then m.activationScene.setFocus(true)
     if which = "login" then m.loginScene.setFocus(true)
